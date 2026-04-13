@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Services</title>
+</head>
+<body>
+    <h1>Available Services</h1>
+
+    {% for service in services %}
+        <p>
+            {{ service[1] }} - ${{ service[2] }} <br>
+            {{ service[3] }}
+            <br>
+            <a href="/book/{{ service[0] }}">Book</a>
+        </p>
+        <hr>
+    {% endfor %}
+
+    <a href="/">Back</a>
+</body>
+</html>

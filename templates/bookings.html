@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bookings</title>
+</head>
+<body>
+    <h1>Bookings</h1>
+
+    {% for b in bookings %}
+        <p>
+            Booking ID: {{ b[0] }} |
+            Service ID: {{ b[2] }} |
+            Status: {{ b[3] }}
+            <br>
+            <a href="/update/{{ b[0] }}">Mark Completed</a> |
+            <a href="/delete/{{ b[0] }}">Delete</a>
+        </p>
+        <hr>
+    {% endfor %}
+
+    <a href="/">Back</a>
+</body>
+</html>
