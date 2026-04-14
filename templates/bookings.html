@@ -2,22 +2,64 @@
 <html>
 <head>
     <title>Bookings</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 30px;
+        }
+        .card {
+            background: white;
+            margin: 15px auto;
+            padding: 20px;
+            width: 350px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        a.button {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: white;
+            border-radius: 5px;
+        }
+        .complete {
+            background-color: blue;
+        }
+        .delete {
+            background-color: red;
+        }
+        .back {
+            margin-top: 20px;
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: gray;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Bookings</h1>
+
+    <h1>Your Bookings</h1>
 
     {% for b in bookings %}
-        <p>
-            Booking ID: {{ b[0] }} |
-            Service ID: {{ b[2] }} |
-            Status: {{ b[3] }}
-            <br>
-            <a href="/update/{{ b[0] }}">Mark Completed</a> |
-            <a href="/delete/{{ b[0] }}">Delete</a>
-        </p>
-        <hr>
+        <div class="card">
+            <p><strong>Booking ID:</strong> {{ b[0] }}</p>
+            <p><strong>Service ID:</strong> {{ b[2] }}</p>
+            <p><strong>Status:</strong> {{ b[3] }}</p>
+
+            <a class="button complete" href="/update/{{ b[0] }}">Mark Completed</a>
+            <a class="button delete" href="/delete/{{ b[0] }}">Delete</a>
+        </div>
     {% endfor %}
 
-    <a href="/">Back</a>
+    <a class="back" href="/">Back to Home</a>
+
 </body>
 </html>

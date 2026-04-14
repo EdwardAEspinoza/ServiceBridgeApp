@@ -2,20 +2,60 @@
 <html>
 <head>
     <title>Services</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 30px;
+        }
+        .card {
+            background: white;
+            margin: 15px auto;
+            padding: 20px;
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        a.button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 15px;
+            background-color: green;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a.button:hover {
+            background-color: darkgreen;
+        }
+        .back {
+            margin-top: 20px;
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: gray;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
+
     <h1>Available Services</h1>
 
-    {% for service in services %}
-        <p>
-            {{ service[1] }} - ${{ service[2] }} <br>
-            {{ service[3] }}
-            <br>
-            <a href="/book/{{ service[0] }}">Book</a>
-        </p>
-        <hr>
+    {% for s in services %}
+        <div class="card">
+            <h3>{{ s[1] }}</h3>
+            <p>{{ s[3] }}</p>
+            <p><strong>${{ s[2] }}</strong></p>
+            <a class="button" href="/book/{{ s[0] }}">Book Service</a>
+        </div>
     {% endfor %}
 
-    <a href="/">Back</a>
+    <a class="back" href="/">Back to Home</a>
+
 </body>
 </html>
