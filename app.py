@@ -1,8 +1,9 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request, session
 import mysql.connector
 import os
 
 app = Flask(__name__)
+app.secret_key = "secret123"
 
 # FUNCTION to connect to DB (fixes connection drop issue)
 def get_db():
@@ -13,14 +14,52 @@ def get_db():
         database=os.getenv("DB_NAME") or "servicebridge_db"
     )
 
-# HOME PAGE
+# HOME → redirect to login
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return redirect('/login')
+
+# LOGIN
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        db = get_db()
+        cursor = db.cursor()
+
+        cursor.execute(
+            "SELECT * FROM Users WHERE Username=%s AND Password=%s",
+            (username, password)
+        )
+        user = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        if user:
+            session['user'] = username
+            return redirect('/services')
+        else:
+            error = "Invalid username or password"
+
+    return render_template('login.html', error=error)
+
+# LOGOUT
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect('/login')
 
 # VIEW SERVICES
 @app.route('/services')
 def services():
+    if 'user' not in session:
+        return redirect('/login')
+
     db = get_db()
     cursor = db.cursor()
 
@@ -32,9 +71,12 @@ def services():
 
     return render_template('services.html', services=data)
 
-# BOOK SERVICE (INSERT)
+# BOOK SERVICE
 @app.route('/book/<int:service_id>')
 def book(service_id):
+    if 'user' not in session:
+        return redirect('/login')
+
     db = get_db()
     cursor = db.cursor()
 
@@ -52,6 +94,9 @@ def book(service_id):
 # VIEW BOOKINGS
 @app.route('/bookings')
 def view_bookings():
+    if 'user' not in session:
+        return redirect('/login')
+
     db = get_db()
     cursor = db.cursor()
 
@@ -66,6 +111,9 @@ def view_bookings():
 # UPDATE BOOKING
 @app.route('/update/<int:id>')
 def update(id):
+    if 'user' not in session:
+        return redirect('/login')
+
     db = get_db()
     cursor = db.cursor()
 
@@ -83,6 +131,9 @@ def update(id):
 # DELETE BOOKING
 @app.route('/delete/<int:id>')
 def delete(id):
+    if 'user' not in session:
+        return redirect('/login')
+
     db = get_db()
     cursor = db.cursor()
 

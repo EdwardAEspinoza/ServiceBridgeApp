@@ -11,6 +11,17 @@
         h1 {
             margin-top: 30px;
         }
+        .topbar {
+            margin-top: 20px;
+        }
+        .topbar a {
+            margin: 5px;
+            padding: 8px 12px;
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
         .card {
             background: white;
             margin: 15px auto;
@@ -44,6 +55,11 @@
 </head>
 <body>
 
+    <div class="topbar">
+        <a href="/bookings">View Bookings</a>
+        <a href="/logout">Logout</a>
+    </div>
+
     <h1>Available Services</h1>
 
     {% for s in services %}
@@ -54,8 +70,6 @@
             <a class="button" href="/book/{{ s[0] }}">Book Service</a>
         </div>
     {% endfor %}
-
-    <a class="back" href="/">Back to Home</a>
 
 </body>
 </html>

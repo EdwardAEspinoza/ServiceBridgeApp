@@ -11,6 +11,17 @@
         h1 {
             margin-top: 30px;
         }
+        .topbar {
+            margin-top: 20px;
+        }
+        .topbar a {
+            margin: 5px;
+            padding: 8px 12px;
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
         .card {
             background: white;
             margin: 15px auto;
@@ -33,18 +44,14 @@
         .delete {
             background-color: red;
         }
-        .back {
-            margin-top: 20px;
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: gray;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
     </style>
 </head>
 <body>
+
+    <div class="topbar">
+        <a href="/services">Back to Services</a>
+        <a href="/logout">Logout</a>
+    </div>
 
     <h1>Your Bookings</h1>
 
@@ -58,8 +65,6 @@
             <a class="button delete" href="/delete/{{ b[0] }}">Delete</a>
         </div>
     {% endfor %}
-
-    <a class="back" href="/">Back to Home</a>
 
 </body>
 </html>
