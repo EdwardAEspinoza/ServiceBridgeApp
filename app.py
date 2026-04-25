@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, session
+from flask import Flask, render_template, redirect, request, session, flash
 import mysql.connector
 import os
 
@@ -14,7 +14,6 @@ def get_db():
         database=os.getenv("DB_NAME") or "servicebridge_db"
     )
 
-# HOME → redirect to login
 @app.route('/')
 def home():
     return redirect('/login')
@@ -22,8 +21,6 @@ def home():
 # LOGIN
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    error = None
-
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -42,19 +39,21 @@ def login():
 
         if user:
             session['user'] = username
+            flash("Login successful!", "success")
             return redirect('/services')
         else:
-            error = "Invalid username or password"
+            flash("Invalid username or password.", "error")
 
-    return render_template('login.html', error=error)
+    return render_template('login.html')
 
 # LOGOUT
 @app.route('/logout')
 def logout():
     session.pop('user', None)
+    flash("Logged out successfully.", "success")
     return redirect('/login')
 
-# VIEW SERVICES
+# SERVICES
 @app.route('/services')
 def services():
     if 'user' not in session:
@@ -64,14 +63,21 @@ def services():
     cursor = db.cursor()
 
     cursor.execute("SELECT * FROM Service")
-    data = cursor.fetchall()
+    services = cursor.fetchall()
+
+    cursor.execute("SELECT COUNT(*) FROM Booking")
+    booking_count = cursor.fetchone()[0]
 
     cursor.close()
     db.close()
 
-    return render_template('services.html', services=data)
+    return render_template(
+        'services.html',
+        services=services,
+        booking_count=booking_count
+    )
 
-# BOOK SERVICE
+# BOOK
 @app.route('/book/<int:service_id>')
 def book(service_id):
     if 'user' not in session:
@@ -84,31 +90,37 @@ def book(service_id):
         "INSERT INTO Booking (ClientID, ServiceID, Status) VALUES (1, %s, 'Pending')",
         (service_id,)
     )
-    db.commit()
 
+    db.commit()
     cursor.close()
     db.close()
 
+    flash("Service booked successfully!", "success")
     return redirect('/services')
 
-# VIEW BOOKINGS
+# BOOKINGS
 @app.route('/bookings')
-def view_bookings():
+def bookings():
     if 'user' not in session:
         return redirect('/login')
 
     db = get_db()
     cursor = db.cursor()
 
-    cursor.execute("SELECT * FROM Booking")
-    data = cursor.fetchall()
+    cursor.execute("""
+        SELECT Booking.BookingID, Service.Name, Booking.Status
+        FROM Booking
+        JOIN Service ON Booking.ServiceID = Service.ServiceID
+    """)
+
+    bookings = cursor.fetchall()
 
     cursor.close()
     db.close()
 
-    return render_template('bookings.html', bookings=data)
+    return render_template('bookings.html', bookings=bookings)
 
-# UPDATE BOOKING
+# COMPLETE BOOKING
 @app.route('/update/<int:id>')
 def update(id):
     if 'user' not in session:
@@ -121,11 +133,12 @@ def update(id):
         "UPDATE Booking SET Status='Completed' WHERE BookingID=%s",
         (id,)
     )
-    db.commit()
 
+    db.commit()
     cursor.close()
     db.close()
 
+    flash("Booking marked completed.", "success")
     return redirect('/bookings')
 
 # DELETE BOOKING
@@ -141,11 +154,12 @@ def delete(id):
         "DELETE FROM Booking WHERE BookingID=%s",
         (id,)
     )
-    db.commit()
 
+    db.commit()
     cursor.close()
     db.close()
 
+    flash("Booking deleted.", "success")
     return redirect('/bookings')
 
 if __name__ == '__main__':

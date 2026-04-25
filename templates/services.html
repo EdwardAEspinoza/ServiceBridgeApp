@@ -1,75 +1,210 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Services</title>
+    <title>Services | ServiceBridge</title>
     <style>
-        body {
-            font-family: Arial;
-            background-color: #f4f4f4;
-            text-align: center;
+        body{
+            margin:0;
+            font-family:Arial,sans-serif;
+            background:#f4f7fb;
         }
-        h1 {
-            margin-top: 30px;
+
+        .navbar{
+            background:#0d6efd;
+            color:white;
+            padding:15px 30px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
         }
-        .topbar {
-            margin-top: 20px;
+
+        .navbar h2{
+            margin:0;
         }
-        .topbar a {
-            margin: 5px;
-            padding: 8px 12px;
-            background-color: #333;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
+
+        .nav-right{
+            display:flex;
+            align-items:center;
+            gap:12px;
         }
-        .card {
-            background: white;
-            margin: 15px auto;
-            padding: 20px;
-            width: 300px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+
+        .navbar a{
+            color:white;
+            text-decoration:none;
+            padding:8px 12px;
+            border-radius:6px;
         }
-        a.button {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 8px 15px;
-            background-color: green;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
+
+        .navbar a:hover{
+            background:rgba(255,255,255,.15);
         }
-        a.button:hover {
-            background-color: darkgreen;
+
+        .welcome{
+            font-size:14px;
+            opacity:.95;
         }
-        .back {
-            margin-top: 20px;
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: gray;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
+
+        .container{
+            width:90%;
+            max-width:1150px;
+            margin:30px auto;
+        }
+
+        h1{
+            text-align:center;
+            margin-bottom:25px;
+            color:#222;
+        }
+
+        .stats{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:18px;
+            margin-bottom:30px;
+        }
+
+        .stat-card{
+            background:white;
+            padding:22px;
+            border-radius:14px;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+            text-align:center;
+        }
+
+        .stat-card h3{
+            margin:0;
+            color:#666;
+            font-size:16px;
+        }
+
+        .stat-card .num{
+            font-size:30px;
+            font-weight:bold;
+            color:#0d6efd;
+            margin-top:10px;
+        }
+
+        .grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+            gap:20px;
+        }
+
+        .card{
+            background:white;
+            padding:22px;
+            border-radius:14px;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+            transition:.2s ease;
+        }
+
+        .card:hover{
+            transform:translateY(-6px);
+            box-shadow:0 12px 28px rgba(0,0,0,.12);
+        }
+
+        .card h3{
+            margin-top:0;
+            color:#0d6efd;
+        }
+
+        .price{
+            font-size:24px;
+            font-weight:bold;
+            margin:15px 0;
+        }
+
+        .btn{
+            display:block;
+            text-align:center;
+            padding:12px;
+            background:#198754;
+            color:white;
+            text-decoration:none;
+            border-radius:8px;
+            font-weight:bold;
+        }
+
+        .btn:hover{
+            background:#157347;
+        }
+
+        .flash{
+            padding:12px;
+            border-radius:8px;
+            margin-bottom:18px;
+        }
+
+        .success{
+            background:#d1e7dd;
+            color:#0f5132;
+        }
+
+        footer{
+            margin-top:50px;
+            text-align:center;
+            color:#666;
+            padding:20px;
         }
     </style>
 </head>
 <body>
 
-    <div class="topbar">
-        <a href="/bookings">View Bookings</a>
+<div class="navbar">
+    <h2>ServiceBridge</h2>
+
+    <div class="nav-right">
+        <div class="welcome">Welcome, {{ session['user'] }}</div>
+        <a href="/bookings">My Bookings</a>
         <a href="/logout">Logout</a>
     </div>
+</div>
+
+<div class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
     <h1>Available Services</h1>
 
-    {% for s in services %}
+    <div class="stats">
+        <div class="stat-card">
+            <h3>Total Services</h3>
+            <div class="num">{{ services|length }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Total Bookings</h3>
+            <div class="num">{{ booking_count }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Status</h3>
+            <div class="num">Live</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        {% for s in services %}
         <div class="card">
             <h3>{{ s[1] }}</h3>
             <p>{{ s[3] }}</p>
-            <p><strong>${{ s[2] }}</strong></p>
-            <a class="button" href="/book/{{ s[0] }}">Book Service</a>
+            <div class="price">${{ s[2] }}</div>
+            <a class="btn" href="/book/{{ s[0] }}">Book Service</a>
         </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
+
+</div>
+
+<footer>
+    © 2026 ServiceBridge. All rights reserved.
+</footer>
 
 </body>
 </html>

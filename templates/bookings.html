@@ -1,70 +1,227 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bookings</title>
+    <title>My Bookings | ServiceBridge</title>
     <style>
-        body {
-            font-family: Arial;
-            background-color: #f4f4f4;
-            text-align: center;
+        body{
+            margin:0;
+            font-family:Arial,sans-serif;
+            background:#f4f7fb;
         }
-        h1 {
-            margin-top: 30px;
+
+        .navbar{
+            background:#0d6efd;
+            color:white;
+            padding:15px 30px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
         }
-        .topbar {
-            margin-top: 20px;
+
+        .navbar h2{
+            margin:0;
         }
-        .topbar a {
-            margin: 5px;
-            padding: 8px 12px;
-            background-color: #333;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
+
+        .nav-right{
+            display:flex;
+            align-items:center;
+            gap:12px;
         }
-        .card {
-            background: white;
-            margin: 15px auto;
-            padding: 20px;
-            width: 350px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+
+        .navbar a{
+            color:white;
+            text-decoration:none;
+            padding:8px 12px;
+            border-radius:6px;
         }
-        a.button {
-            display: inline-block;
-            margin: 5px;
-            padding: 8px 12px;
-            text-decoration: none;
-            color: white;
-            border-radius: 5px;
+
+        .navbar a:hover{
+            background:rgba(255,255,255,.15);
         }
-        .complete {
-            background-color: blue;
+
+        .welcome{
+            font-size:14px;
+            opacity:.95;
         }
-        .delete {
-            background-color: red;
+
+        .container{
+            width:90%;
+            max-width:1150px;
+            margin:30px auto;
+        }
+
+        h1{
+            text-align:center;
+            color:#222;
+            margin-bottom:25px;
+        }
+
+        .flash{
+            padding:12px;
+            border-radius:8px;
+            margin-bottom:18px;
+        }
+
+        .success{
+            background:#d1e7dd;
+            color:#0f5132;
+        }
+
+        .grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+            gap:20px;
+        }
+
+        .card{
+            background:white;
+            padding:22px;
+            border-radius:14px;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+            transition:.2s ease;
+        }
+
+        .card:hover{
+            transform:translateY(-6px);
+            box-shadow:0 12px 28px rgba(0,0,0,.12);
+        }
+
+        .card p{
+            margin:10px 0;
+            color:#333;
+        }
+
+        .status{
+            display:inline-block;
+            padding:6px 12px;
+            border-radius:20px;
+            font-size:14px;
+            font-weight:bold;
+            margin-top:8px;
+        }
+
+        .pending{
+            background:#fff3cd;
+            color:#856404;
+        }
+
+        .completed{
+            background:#d1e7dd;
+            color:#0f5132;
+        }
+
+        .actions{
+            margin-top:18px;
+            display:flex;
+            gap:10px;
+        }
+
+        .btn{
+            flex:1;
+            text-align:center;
+            padding:10px;
+            color:white;
+            text-decoration:none;
+            border-radius:8px;
+            font-weight:bold;
+        }
+
+        .complete-btn{
+            background:#0d6efd;
+        }
+
+        .complete-btn:hover{
+            background:#0b5ed7;
+        }
+
+        .delete-btn{
+            background:#dc3545;
+        }
+
+        .delete-btn:hover{
+            background:#bb2d3b;
+        }
+
+        .empty{
+            background:white;
+            padding:35px;
+            border-radius:14px;
+            text-align:center;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+        }
+
+        footer{
+            margin-top:50px;
+            text-align:center;
+            color:#666;
+            padding:20px;
         }
     </style>
 </head>
 <body>
 
-    <div class="topbar">
-        <a href="/services">Back to Services</a>
+<div class="navbar">
+    <h2>ServiceBridge</h2>
+
+    <div class="nav-right">
+        <div class="welcome">Welcome, {{ session['user'] }}</div>
+        <a href="/services">Services</a>
         <a href="/logout">Logout</a>
     </div>
+</div>
 
-    <h1>Your Bookings</h1>
+<div class="container">
 
-    {% for b in bookings %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h1>My Bookings</h1>
+
+    {% if bookings %}
+    <div class="grid">
+        {% for b in bookings %}
         <div class="card">
-            <p><strong>Booking ID:</strong> {{ b[0] }}</p>
-            <p><strong>Service ID:</strong> {{ b[2] }}</p>
-            <p><strong>Status:</strong> {{ b[3] }}</p>
 
-            <a class="button complete" href="/update/{{ b[0] }}">Mark Completed</a>
-            <a class="button delete" href="/delete/{{ b[0] }}">Delete</a>
+            <p><strong>Booking ID:</strong> {{ b[0] }}</p>
+            <p><strong>Service:</strong> {{ b[1] }}</p>
+            <p><strong>Status:</strong></p>
+
+            {% if b[2] == 'Completed' %}
+                <span class="status completed">{{ b[2] }}</span>
+            {% else %}
+                <span class="status pending">{{ b[2] }}</span>
+            {% endif %}
+
+            <div class="actions">
+                <a class="btn complete-btn" href="/update/{{ b[0] }}">Complete</a>
+
+                <a class="btn delete-btn"
+                   href="/delete/{{ b[0] }}"
+                   onclick="return confirm('Delete this booking?');">
+                   Delete
+                </a>
+            </div>
+
         </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="empty">
+            <h3>No bookings yet</h3>
+            <p>Go to the services page to create your first booking.</p>
+        </div>
+    {% endif %}
+
+</div>
+
+<footer>
+    © 2026 ServiceBridge. All rights reserved.
+</footer>
 
 </body>
 </html>
